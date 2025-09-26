@@ -16,11 +16,11 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
-/* ===== 여기서부터 반드시 export 해줘야 콘솔/다른 파일에서 보임 ===== */
+/* ===== 여기서부터 반드시 export ===== */
 
 export type Membership = {
   id: number;
-  name: string;
+  name: string; // (구 UI 호환용 필드)
   days: number;
   can_learn: boolean;
   can_chat: boolean;
@@ -50,10 +50,27 @@ export async function getMemberships(email: string): Promise<UserMembership[]> {
   return api<UserMembership[]>(`/api/v1/users/memberships?email=${q}`);
 }
 
-/** 특정 유저가 채팅 가능한지 여부 */
-export async function canUserChat(email: string) {
-  const q = encodeURIComponent(email);
-  return api<{ can_chat: boolean }>(`/api/v1/users/can_chat?email=${q}`);
+/** 서버가 만료/권한을 판정 — /api/v1/me/can_chat */
+export type CanChatMembershipItem = {
+  id: number;
+  title: string;
+  expiresAt: string;
+  features: string[];
+};
+
+export type CanChatResponse = {
+  canChat: boolean;
+  features: string[];
+  memberships: CanChatMembershipItem[];
+};
+
+export function getCanChat() {
+  return api<CanChatResponse>("/api/v1/me/can_chat");
+}
+
+/** (레거시 호환) canUserChat -> /me/can_chat 호출로 변경 */
+export function canUserChat() {
+  return getCanChat();
 }
 
 /** (결제 가정) 유저가 멤버십 구매 */
@@ -83,14 +100,15 @@ export async function revokeMembership(email: string, user_membership_id: number
   );
 }
 
-/* (선택) 필요하면 default export는 아예 두지 않거나, 아래처럼 보조로만 사용
+/* (선택) default export가 필요하면 아래 주석 해제
 export default {
   api,
   listMemberships,
   getMemberships,
-  canUserChat,
+  canUserChat,   // alias of getCanChat
   purchaseMembership,
   grantMembership,
   revokeMembership,
+  getCanChat,
 };
 */

@@ -1,4 +1,3 @@
-# config/routes.rb
 Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
@@ -19,9 +18,12 @@ Rails.application.routes.draw do
           post   :purchase
           post   :grant
           delete :revoke
-          get    :can_chat
+          # 여기 있던 can_chat 은 삭제 ✅
         end
       end
+
+      # Checks API
+      get "me/can_chat", to: "checks#can_chat"
     end
   end
 end

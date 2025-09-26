@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_26_012004) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_26_092623) do
   create_table "memberships", force: :cascade do |t|
     t.string "name"
     t.integer "days"
@@ -19,6 +19,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_012004) do
     t.boolean "can_analyze"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "features", default: [], null: false
+    t.integer "duration_days", default: 30, null: false
+    t.string "title", default: "", null: false
   end
 
   create_table "notes", force: :cascade do |t|
@@ -35,6 +38,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_012004) do
     t.date "ends_on"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "expires_at", null: false
+    t.index ["expires_at"], name: "index_user_memberships_on_expires_at"
     t.index ["membership_id"], name: "index_user_memberships_on_membership_id"
     t.index ["user_id"], name: "index_user_memberships_on_user_id"
   end

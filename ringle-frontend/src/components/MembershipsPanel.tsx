@@ -1,201 +1,142 @@
-// ringle-frontend/src/components/MembershipsPanel.tsx
 import { useEffect, useState } from "react";
-import type { Membership } from "../lib/api";
-import {
-  listMemberships,
-  getMemberships,
-  canUserChat,
-  purchaseMembership,
-  grantMembership,
-  revokeMembership,
-} from "../lib/api";
-
-type MyMembership = {
-  id: number;
-  name: string;
-  ends_on: string;
-  active: boolean;
-  features: { learn: boolean; chat: boolean; analyze: boolean };
-  // 회수 버튼 표시에 사용 (없으면 버튼 숨김)
-  user_membership_id?: number;
-};
+import { listMemberships, purchaseMembership, grantMembership, revokeMembership, getCanChat } from "../lib/api";
+import type { CanChatResponse } from "../lib/api";
 
 export default function MembershipsPanel() {
-  const [allMemberships, setAllMemberships] = useState<Membership[]>([]);
-  const [myMemberships, setMyMemberships] = useState<MyMembership[]>([]);
-  const [canChat, setCanChat] = useState<boolean | null>(null);
-
-  // 빠른 액션 입력
   const [email, setEmail] = useState("demo@ringle.test");
   const [membershipId, setMembershipId] = useState<number>(2);
-
-  // 상태
+  const [all, setAll] = useState<any[]>([]);
+  const [me, setMe] = useState<CanChatResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [doing, setDoing] = useState<null | "purchase" | "grant" | "revoke">(null);
-  const [error, setError] = useState<string | null>(null);
 
-  async function refresh() {
+  async function refreshAll() {
+    const ms = await listMemberships();
+    // 백엔드 최신 스키마(title, duration_days, features)를 보여주도록 변환
+    const normalized = (ms as any[]).map((m) => ({
+      id: m.id,
+      title: m.title ?? m.name ?? `#${m.id}`,
+      durationDays: m.duration_days ?? m.days ?? null,
+      features: m.features ?? [],
+      raw: m,
+    }));
+    setAll(normalized);
+  }
+
+  async function refreshMe() {
+    const r = await getCanChat();
+    setMe(r);
+  }
+
+  useEffect(() => {
+    (async () => {
+      await refreshAll();
+      await refreshMe();
+    })();
+  }, []);
+
+  async function onPurchase() {
     setLoading(true);
-    setError(null);
     try {
-      const [all, mine, chat] = await Promise.all([
-        listMemberships(),
-        getMemberships(email),
-        canUserChat(email),
-      ]);
-      setAllMemberships(all);
-      setMyMemberships(mine as MyMembership[]);
-      setCanChat(chat.can_chat);
-    } catch (err: any) {
-      setError(err?.message ?? String(err));
+      await purchaseMembership(email, membershipId);
+      await refreshMe();
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function doPurchase() {
+  async function onGrant() {
+    setLoading(true);
     try {
-      setDoing("purchase");
-      setError(null);
-      await purchaseMembership(email, membershipId);
-      await refresh();
-    } catch (err: any) {
-      setError(err?.message ?? String(err));
-    } finally {
-      setDoing(null);
-    }
-  }
-
-  async function doGrant() {
-    try {
-      setDoing("grant");
-      setError(null);
       await grantMembership(email, membershipId);
-      await refresh();
-    } catch (err: any) {
-      setError(err?.message ?? String(err));
+      await refreshMe();
     } finally {
-      setDoing(null);
+      setLoading(false);
     }
   }
 
-  async function doRevoke(userMembershipId: number) {
+  async function onRevoke(user_membership_id: number) {
+    setLoading(true);
     try {
-      setDoing("revoke");
-      setError(null);
-      await revokeMembership(email, userMembershipId);
-      await refresh();
-    } catch (err: any) {
-      setError(err?.message ?? String(err));
+      await revokeMembership(email, user_membership_id);
+      await refreshMe();
     } finally {
-      setDoing(null);
+      setLoading(false);
     }
   }
 
   return (
-    <div>
-      <h2>Memberships Panel</h2>
-
-      {/* 빠른 액션 영역 */}
-      <div
-        style={{
-          margin: "12px 0 20px",
-          padding: 12,
-          border: "1px solid #e1e1e1",
-          borderRadius: 8,
-          display: "grid",
-          gap: 8,
-          alignItems: "center",
-          maxWidth: 560,
-        }}
-      >
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="email"
-            style={{ minWidth: 260 }}
-          />
-          <input
-            type="number"
-            value={membershipId}
-            onChange={(e) => setMembershipId(Number(e.target.value))}
-            placeholder="membership_id"
-            style={{ width: 160 }}
-          />
-          <button onClick={doPurchase} disabled={!!doing}>
-            {doing === "purchase" ? "Purchasing..." : "Purchase"}
-          </button>
-          <button onClick={doGrant} disabled={!!doing}>
-            {doing === "grant" ? "Granting..." : "Grant"}
-          </button>
-          <button onClick={refresh} disabled={loading || !!doing}>
-            {loading ? "Refreshing..." : "Refresh"}
-          </button>
-        </div>
-        <small style={{ opacity: 0.7 }}>
-          구매/지급 후 자동으로 “내 멤버십”과 “Can Chat”을 재조회합니다.
-        </small>
+    <section style={{ maxWidth: 720, margin: "0 auto" }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ flex: 1 }}
+          placeholder="email"
+        />
+        <input
+          value={membershipId}
+          onChange={(e) => setMembershipId(Number(e.target.value || 0))}
+          style={{ width: 80 }}
+          placeholder="membership id"
+        />
+        <button onClick={onPurchase} disabled={loading}>
+          Purchase
+        </button>
+        <button onClick={onGrant} disabled={loading}>
+          Grant
+        </button>
+        <button onClick={() => { refreshAll(); refreshMe(); }} disabled={loading}>
+          Refresh
+        </button>
       </div>
 
-      {error && (
-        <p style={{ color: "crimson" }}>
-          <strong>Error:</strong> {error}
-        </p>
-      )}
+      <p style={{ color: "#888", marginTop: 4 }}>
+        구매/지급 후 자동으로 “내 멤버십”과 “Can Chat”을 재조회합니다.
+      </p>
 
-      <h3>All Memberships</h3>
-      <pre>{JSON.stringify(allMemberships, null, 2)}</pre>
+      {/* All Memberships */}
+      <h3 style={{ marginTop: 24, textAlign: "center" }}>All Memberships</h3>
+      <pre style={{ background: "#fafafa", padding: 12, borderRadius: 8 }}>
+        {JSON.stringify(all, null, 2)}
+      </pre>
 
-      <h3>My Memberships</h3>
-      {!myMemberships.length ? (
-        <pre>[]</pre>
-      ) : (
-        <ul style={{ paddingLeft: 0, listStyle: "none", display: "grid", gap: 8 }}>
-          {myMemberships.map((m) => (
-            <li
-              key={`${m.id}-${m.ends_on}`}
+      {/* My Memberships + Can Chat */}
+      <h3 style={{ marginTop: 24, textAlign: "center" }}>My Memberships</h3>
+      <div style={{ background: "#fafafa", padding: 12, borderRadius: 8 }}>
+        {me?.memberships?.length ? (
+          me.memberships.map((m, idx) => (
+            <div
+              key={m.id + "-" + idx}
               style={{
-                border: "1px solid #eee",
-                borderRadius: 8,
-                padding: 10,
-                display: "grid",
-                gap: 6,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "8px 0",
+                borderBottom: "1px solid #eee",
               }}
             >
               <div>
-                <strong>{m.name}</strong> — until {m.ends_on}{" "}
-                {m.active ? "(active)" : "(inactive)"}
-              </div>
-              <pre style={{ margin: 0 }}>{JSON.stringify(m.features, null, 2)}</pre>
-
-              {typeof m.user_membership_id === "number" ? (
                 <div>
-                  <button
-                    onClick={() => doRevoke(m.user_membership_id!)}
-                    disabled={!!doing}
-                  >
-                    {doing === "revoke" ? "Revoking..." : "Revoke"}
-                  </button>
+                  <strong>{m.title}</strong> — until{" "}
+                  <code>{m.expiresAt}</code>
                 </div>
-              ) : (
-                <small style={{ opacity: 0.6 }}>
-                  (Note) 이 항목에는 <code>user_membership_id</code> 가 없어 회수 버튼을
-                  숨겼습니다.
-                </small>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+                <div style={{ fontSize: 12, color: "#666" }}>
+                  features: {m.features.join(", ") || "—"}
+                </div>
+              </div>
+              {/* 회수 버튼: /users/revoke 는 user_membership_id 가 필요.
+                  미션 데모에서는 id 확인 편의상 숨김 유지. 백엔드가 id를 내려주면 여기서 onRevoke(id) 호출 */}
+            </div>
+          ))
+        ) : (
+          <div style={{ color: "#666" }}>No active memberships.</div>
+        )}
+      </div>
 
-      <h3>Can Chat?</h3>
-      <pre>{JSON.stringify(canChat)}</pre>
-    </div>
+      <h3 style={{ marginTop: 24, textAlign: "center" }}>Can Chat?</h3>
+      <pre style={{ background: "#fafafa", padding: 12, borderRadius: 8 }}>
+        {me ? JSON.stringify(me, null, 2) : "—"}
+      </pre>
+    </section>
   );
 }

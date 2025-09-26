@@ -1,5 +1,15 @@
-Membership.create!([
-  { name: "Basic 30",   days: 30, can_learn: true,  can_chat: false, can_analyze: false },
-  { name: "Premium 60", days: 60, can_learn: true,  can_chat: true,  can_analyze: true }
-])
-User.find_or_create_by!(email: "demo@ringle.test")
+basic = Membership.find_or_create_by!(title: 'Basic') do |m|
+  m.features = %w[learn]
+  m.duration_days = 30
+end
+
+premium = Membership.find_or_create_by!(title: 'Premium') do |m|
+  m.features = %w[learn chat analyze]
+  m.duration_days = 60
+end
+
+user = User.first || User.create!(email: 'demo@ringle.test')
+
+UserMembership.find_or_create_by!(user: user, membership: premium) do |um|
+  um.expires_at = Time.current + premium.duration_days.days
+end
