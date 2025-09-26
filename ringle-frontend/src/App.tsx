@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { api } from "./lib/api";
+import MembershipsPanel from "./components/MembershipsPanel";   // ✅ 추가
 
 type Ping = { ok: boolean; time: string };
 type Note = {
@@ -119,14 +120,21 @@ export default function App() {
   return (
     <div style={{ padding: 24, fontFamily: "system-ui, sans-serif" }}>
       <h1>Ringle Frontend</h1>
-      <p style={{ opacity: 0.7 }}>API_BASE: {import.meta.env.VITE_API_BASE_URL}</p>
+      <p style={{ opacity: 0.7 }}>
+        API_BASE: {import.meta.env.VITE_API_BASE_URL}
+      </p>
 
       <section>
         <h2>Ping</h2>
         {ping ? <pre>{JSON.stringify(ping, null, 2)}</pre> : <p>Loading…</p>}
       </section>
 
-      <section>
+      {/* ✅ Memberships 섹션 추가 */}
+      <section style={{ marginTop: 24 }}>
+        <MembershipsPanel />
+      </section>
+
+      <section style={{ marginTop: 24 }}>
         <h2>Notes</h2>
 
         <button onClick={loadNotes} disabled={loadingNotes}>
@@ -154,7 +162,9 @@ export default function App() {
               {creating ? "Saving..." : "Create note"}
             </button>
           </div>
-          {createError && <p style={{ color: "crimson" }}>Create error: {createError}</p>}
+          {createError && (
+            <p style={{ color: "crimson" }}>Create error: {createError}</p>
+          )}
         </form>
 
         {/* 목록 + 편집/삭제 */}

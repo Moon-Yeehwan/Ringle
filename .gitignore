@@ -1,0 +1,30 @@
+# 공통
+.DS_Store
+Thumbs.db
+
+# Frontend (Vite/Node)
+**/node_modules/
+**/dist/
+**/.vite/
+**/.env
+**/.env.*.local
+**/.eslintcache
+
+# Rails & Ruby
+**/.bundle/
+**/log/
+**/tmp/
+**/vendor/bundle/
+**/.byebug_history
+**/coverage/
+**/public/assets/
+**/storage/
+**/tmp/pids/
+**/tmp/cache/
+**/tmp/sockets/
+
+# SQLite dev DB (커밋 금지)
+**/db/*.sqlite3
+**/db/*.sqlite3-*
+# Rails master key는 기본적으로 ignore
+**/config/master.key
