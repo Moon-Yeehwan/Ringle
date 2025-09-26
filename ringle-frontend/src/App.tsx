@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { api } from "./lib/api";
-import MembershipsPanel from "./components/MembershipsPanel";   // ✅ 추가
+import MembershipsPanel from "./components/MembershipsPanel";
+import { Link } from "react-router-dom";
 
 type Ping = { ok: boolean; time: string };
 type Note = {
@@ -66,8 +67,7 @@ export default function App() {
       });
       setTitle("");
       setBody("");
-      // 낙관적 갱신
-      setNotes((prev) => [created, ...prev]);
+      setNotes((prev) => [created, ...prev]); // 낙관적 갱신
     } catch (e: any) {
       setCreateError(e.message ?? String(e));
     } finally {
@@ -120,16 +120,30 @@ export default function App() {
   return (
     <div style={{ padding: 24, fontFamily: "system-ui, sans-serif" }}>
       <h1>Ringle Frontend</h1>
-      <p style={{ opacity: 0.7 }}>
-        API_BASE: {import.meta.env.VITE_API_BASE_URL}
-      </p>
+      <p style={{ opacity: 0.7 }}>API_BASE: {import.meta.env.VITE_API_BASE}</p>
+
+      {/* 🔗 /chat 이동 링크 추가 */}
+      <div style={{ marginTop: 8 }}>
+        <Link
+          to="/chat"
+          style={{
+            display: "inline-block",
+            padding: "8px 12px",
+            border: "1px solid #ddd",
+            borderRadius: 8,
+            textDecoration: "none",
+          }}
+        >
+          ➡️ 대화 페이지로 이동
+        </Link>
+      </div>
 
       <section>
         <h2>Ping</h2>
         {ping ? <pre>{JSON.stringify(ping, null, 2)}</pre> : <p>Loading…</p>}
       </section>
 
-      {/* ✅ Memberships 섹션 추가 */}
+      {/* Memberships 섹션 */}
       <section style={{ marginTop: 24 }}>
         <MembershipsPanel />
       </section>

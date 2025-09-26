@@ -1,11 +1,25 @@
 // ringle-frontend/src/lib/api.ts
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "http://127.0.0.1:3000";
+/** API base: Vite env -> 기본 '/api' (Vite proxy 경유) */
+const RAW_BASE =
+  (import.meta.env.VITE_API_BASE as string | undefined) ??
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? // 과거 키 호환
+  "/api";
 
-/** 공통 JSON fetch */
+/** 슬래시 정리 유틸 */
+const trimSlash = (s: string) => s.replace(/\/+$/, "");
+const ensureLeading = (s: string) => (s.startsWith("/") ? s : `/${s}`);
+
+/** 프록시 베이스 */
+const API_BASE = trimSlash(RAW_BASE);
+
+/** 공통 JSON fetch (경로 보정 포함) */
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  // 만약 실수로 '/api/...'가 들어오면 한 번 제거해서 '/v1/...'만 남기기
+  const cleanedPath = path.replace(/^\/api(\/|$)/, "/");
+  const url = `${API_BASE}${ensureLeading(cleanedPath)}`;
+
+  const res = await fetch(url, {
     headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
     ...init,
   });
@@ -41,16 +55,16 @@ export type UserMembership = {
 
 /** 모든 멤버십 목록 */
 export async function listMemberships(): Promise<Membership[]> {
-  return api<Membership[]>("/api/v1/memberships");
+  return api<Membership[]>("/v1/memberships");
 }
 
 /** 특정 유저의 멤버십들 */
 export async function getMemberships(email: string): Promise<UserMembership[]> {
   const q = encodeURIComponent(email);
-  return api<UserMembership[]>(`/api/v1/users/memberships?email=${q}`);
+  return api<UserMembership[]>(`/v1/users/memberships?email=${q}`);
 }
 
-/** 서버가 만료/권한을 판정 — /api/v1/me/can_chat */
+/** 서버가 만료/권한을 판정 — /v1/me/can_chat */
 export type CanChatMembershipItem = {
   id: number;
   title: string;
@@ -65,7 +79,7 @@ export type CanChatResponse = {
 };
 
 export function getCanChat() {
-  return api<CanChatResponse>("/api/v1/me/can_chat");
+  return api<CanChatResponse>("/v1/me/can_chat");
 }
 
 /** (레거시 호환) canUserChat -> /me/can_chat 호출로 변경 */
@@ -77,7 +91,7 @@ export function canUserChat() {
 export async function purchaseMembership(email: string, membership_id: number) {
   const body = JSON.stringify({ membership_id });
   return api<{ ok: boolean; user_membership_id: number }>(
-    `/api/v1/users/purchase?email=${encodeURIComponent(email)}`,
+    `/v1/users/purchase?email=${encodeURIComponent(email)}`,
     { method: "POST", body }
   );
 }
@@ -86,7 +100,7 @@ export async function purchaseMembership(email: string, membership_id: number) {
 export async function grantMembership(email: string, membership_id: number) {
   const body = JSON.stringify({ membership_id });
   return api<{ ok: boolean; user_membership_id: number }>(
-    `/api/v1/users/grant?email=${encodeURIComponent(email)}`,
+    `/v1/users/grant?email=${encodeURIComponent(email)}`,
     { method: "POST", body }
   );
 }
@@ -95,20 +109,7 @@ export async function grantMembership(email: string, membership_id: number) {
 export async function revokeMembership(email: string, user_membership_id: number) {
   const body = JSON.stringify({ user_membership_id });
   return api<{ ok: boolean }>(
-    `/api/v1/users/revoke?email=${encodeURIComponent(email)}`,
+    `/v1/users/revoke?email=${encodeURIComponent(email)}`,
     { method: "DELETE", body }
   );
 }
-
-/* (선택) default export가 필요하면 아래 주석 해제
-export default {
-  api,
-  listMemberships,
-  getMemberships,
-  canUserChat,   // alias of getCanChat
-  purchaseMembership,
-  grantMembership,
-  revokeMembership,
-  getCanChat,
-};
-*/
