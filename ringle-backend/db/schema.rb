@@ -10,11 +10,41 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_25_031051) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_26_012004) do
+  create_table "memberships", force: :cascade do |t|
+    t.string "name"
+    t.integer "days"
+    t.boolean "can_learn"
+    t.boolean "can_chat"
+    t.boolean "can_analyze"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "notes", force: :cascade do |t|
     t.string "title"
     t.text "body"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "user_memberships", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "membership_id", null: false
+    t.date "starts_on"
+    t.date "ends_on"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["membership_id"], name: "index_user_memberships_on_membership_id"
+    t.index ["user_id"], name: "index_user_memberships_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "user_memberships", "memberships"
+  add_foreign_key "user_memberships", "users"
 end
