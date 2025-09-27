@@ -1,29 +1,24 @@
+# config/routes.rb
 Rails.application.routes.draw do
-  get "up" => "rails/health#show", as: :rails_health_check
-
   namespace :api do
     namespace :v1 do
-      get :ping, to: "ping#index"
+      # --- Memberships ---
+      resources :memberships, only: [:index]  # GET /api/v1/memberships
 
-      # Notes API
-      resources :notes, only: %i[index show create update destroy]
+      # --- Users ---
+      get    'users/memberships', to: 'users#memberships'  # GET  /api/v1/users/memberships?email=...
+      post   'users/grant',       to: 'users#grant'        # POST /api/v1/users/grant        { email, membership_id }
+      post   'users/purchase',    to: 'users#purchase'     # POST /api/v1/users/purchase     { email, membership_id }
+      delete 'users/revoke',      to: 'users#revoke'       # DEL  /api/v1/users/revoke       { email, user_membership_id }
 
-      # Memberships API
-      resources :memberships, only: [:index, :show, :create, :destroy]
+      # --- Me ---
+      get 'me/can_chat', to: 'me#can_chat'                 # GET  /api/v1/me/can_chat?email=...
 
-      # Users API (membership 관련) — 모두 컬렉션 라우트
-      resources :users, only: [] do
-        collection do
-          get    :memberships
-          post   :purchase
-          post   :grant
-          delete :revoke
-          # ⛔ can_chat 은 여기서 제거
-        end
-      end
+      # --- Notes (화면에 버튼 있으니 같이 노출) ---
+      resources :notes, only: [:index, :create]            # GET /api/v1/notes, POST /api/v1/notes
 
-      # Me API (권한 체크)
-      get "me/can_chat", to: "me#can_chat"
+      # --- Ping (상단 Ping 카드) ---
+      get 'ping', to: 'ping#show'                          # GET /api/v1/ping
     end
   end
 end

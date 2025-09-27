@@ -1,5 +1,9 @@
-class Api::V1::PingController < ApplicationController
-  def index
-    render json: { ok: true, time: Time.zone.now }
+module Api
+  module V1
+    class PingController < ApplicationController
+      def show
+        render json: { ok: true, time: Time.current.iso8601 }
+      end
+    end
   end
 end
