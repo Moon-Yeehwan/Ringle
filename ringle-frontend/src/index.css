@@ -1,39 +1,27 @@
+/* src/index.css */
+
+/* 기본 타이포 & 렌더링 품질 */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
+  color: #0f172a;           /* 항상 라이트 기준 */
+  background-color: #ffffff;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 페이지 전체 높이 확보 */
+html, body, #root { height: 100%; }
+
+/* 전역 링크/버튼 기본 스타일(기존 유지) */
 a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
 }
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+a:hover { color: #535bf2; }
 
 button {
   border-radius: 8px;
@@ -42,27 +30,33 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #f9f9f9;
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
-  border-color: #646cff;
-}
+button:hover { border-color: #646cff; }
 button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+button:focus-visible { outline: 4px auto -webkit-focus-ring-color; }
+
+h1 { font-size: 3.2em; line-height: 1.1; }
+
+/* ✅ 중앙 정렬 핵심: #root 폭 제한 + 가로 가운데 */
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #fff;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+#root {
+  width: min(960px, 100%);   /* 최대 960px, 모바일은 100% */
+  margin: 0 auto;            /* 좌우 가운데 */
+  padding: 0 16px 80px;      /* 좌우 여백 + 하단 여백 */
+  box-sizing: border-box;
 }
+
+/* 다크 모드 강제 전환 제거 (원하면 아래 주석 해제해서 사용)
+@media (prefers-color-scheme: dark) {
+  :root { color: #e5e7eb; background-color: #0b1220; }
+  button { background-color: #1a1a1a; }
+}
+*/
