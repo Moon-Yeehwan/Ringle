@@ -1,7 +1,6 @@
 ## 실행 방법
 
 
-```md
 
 ### backend
 ```bash
