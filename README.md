@@ -1,5 +1,7 @@
 ## 실행 방법
-### Backend
+
+
+### backend
 ```bash
 cd ringle-backend
 bundle install
