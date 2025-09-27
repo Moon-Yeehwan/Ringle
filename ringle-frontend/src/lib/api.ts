@@ -41,6 +41,10 @@ export type Membership = {
   can_analyze: boolean;
   created_at?: string;
   updated_at?: string;
+  // 백엔드 최신 스키마 호환
+  title?: string;
+  duration_days?: number;
+  features?: string[];
 };
 
 export type UserMembership = {
@@ -58,8 +62,9 @@ export async function listMemberships(): Promise<Membership[]> {
   return api<Membership[]>("/v1/memberships");
 }
 
-/** 특정 유저의 멤버십들 */
+/** 특정 유저의 멤버십들 (email 필요) */
 export async function getMemberships(email: string): Promise<UserMembership[]> {
+  if (!email) throw new Error("getMemberships: email is required"); // ✅ 가드
   const q = encodeURIComponent(email);
   return api<UserMembership[]>(`/v1/users/memberships?email=${q}`);
 }
@@ -89,6 +94,7 @@ export function canUserChat() {
 
 /** (결제 가정) 유저가 멤버십 구매 */
 export async function purchaseMembership(email: string, membership_id: number) {
+  if (!email) throw new Error("purchaseMembership: email is required"); // ✅
   const body = JSON.stringify({ membership_id });
   return api<{ ok: boolean; user_membership_id: number }>(
     `/v1/users/purchase?email=${encodeURIComponent(email)}`,
@@ -98,6 +104,7 @@ export async function purchaseMembership(email: string, membership_id: number) {
 
 /** (어드민) 유저에게 멤버십 부여 */
 export async function grantMembership(email: string, membership_id: number) {
+  if (!email) throw new Error("grantMembership: email is required"); // ✅
   const body = JSON.stringify({ membership_id });
   return api<{ ok: boolean; user_membership_id: number }>(
     `/v1/users/grant?email=${encodeURIComponent(email)}`,
@@ -107,9 +114,21 @@ export async function grantMembership(email: string, membership_id: number) {
 
 /** (어드민) 유저 멤버십 회수 */
 export async function revokeMembership(email: string, user_membership_id: number) {
+  if (!email) throw new Error("revokeMembership: email is required"); // ✅
   const body = JSON.stringify({ user_membership_id });
   return api<{ ok: boolean }>(
     `/v1/users/revoke?email=${encodeURIComponent(email)}`,
     { method: "DELETE", body }
   );
+}
+
+/** 전체/내 멤버십 + 권한 상태 한번에 가져오기 (이메일 필요) */
+export async function fetchAllMembershipData(email: string) {
+  if (!email) throw new Error("fetchAllMembershipData: email is required"); // ✅ 가드
+  const [all, mine, me] = await Promise.all([
+    listMemberships(),      // GET /api/v1/memberships
+    getMemberships(email),  // GET /api/v1/users/memberships?email=...
+    getCanChat(),           // GET /api/v1/me/can_chat
+  ]);
+  return { all, mine, me };
 }

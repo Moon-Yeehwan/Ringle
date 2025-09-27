@@ -18,12 +18,12 @@ Rails.application.routes.draw do
           post   :purchase
           post   :grant
           delete :revoke
-          # 여기 있던 can_chat 은 삭제 ✅
+          # ⛔ can_chat 은 여기서 제거
         end
       end
 
-      # Checks API
-      get "me/can_chat", to: "checks#can_chat"
+      # Me API (권한 체크)
+      get "me/can_chat", to: "me#can_chat"
     end
   end
 end
