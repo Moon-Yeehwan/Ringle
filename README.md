@@ -50,10 +50,3 @@ Grant 후 → Premium 활성 + Can Chat=true
 
 <img src="screen_F_notes.png" width="500"/>
 
-
-
-
-추가 기능: Notes CRUD 확인  
-
-![Notes 화면](./screen_F_notes.png)
-
