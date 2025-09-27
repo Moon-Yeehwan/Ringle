@@ -37,14 +37,14 @@ DELETE /api/v1/users/revoke → 멤버십 회수
 
 만료 후 홈 → My Memberships 없음 + Can Chat=false
 
-![Ping 정상 응답](screen_A_ping.png)
-![만료된 홈](screen_B_expired_home.png)
-![Chat 차단 화면](screen_C_chat_block.png)
+![Ping 정상 응답](screen_A_ping.png)  
+![만료된 홈](screen_B_expired_home.png)  
+![Chat 차단 화면](screen_C_chat_block.png)  
 
 Grant 후 → Premium 활성 + Can Chat=true
 
-![Grant 후 홈](screen_D_grant_home.png)
-![Chat 첫 인사 화면](screen_E_chat_welcome.png)
+![Grant 후 홈](screen_D_grant_home.png)  
+![Chat 첫 인사 화면](screen_E_chat_welcome.png)  
 
 추가 기능: Notes CRUD 확인
 
