@@ -3,7 +3,6 @@
 
 
 ### backend
-```bash
 cd ringle-backend
 bundle install
 rails db:setup   # 시드 포함 (Basic 30d, Premium 60d)
