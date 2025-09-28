@@ -42,7 +42,7 @@ DELETE /api/v1/users/revoke → 멤버십 회수
 <img src="./ringle-frontend/memberships.png" width="500"/>
 
 ## 4. Notes 생성/조회
-<img src="./ringle-frontend/chat_note.png" width="500"/>
+<img src="./ringle-frontend/chat note.png" width="500"/>
 
 ## 5. AI 대화
 <img src="./ringle-frontend/ai_chat.png" width="500"/>
