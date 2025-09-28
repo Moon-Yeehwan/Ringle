@@ -1,7 +1,5 @@
 ## 실행 방법
 
-
-
 ### backend
 cd ringle-backend
 bundle install
@@ -12,6 +10,8 @@ rails s
 cd ringle-frontend
 pnpm install
 pnpm dev  # VITE_API_BASE=/api
+
+
 
 
 ### 주요 API
@@ -29,12 +29,16 @@ POST /api/v1/users/purchase → 멤버십 구매
 DELETE /api/v1/users/revoke → 멤버십 회수
 
 
+
+
 ### 설계 및 기술 스택 선정 배경
 - **Backend**: Ruby on Rails (API 서버, 빠른 개발 속도와 RESTful 구조 제공)
 - **Frontend**: React (Vite 기반, 빠른 빌드/핫리로드)
 - **DB**: SQLite (과제 환경에 맞춘 간단한 로컬 DB)
 - **UI Framework**: TailwindCSS (빠른 스타일링)
 - **State 관리**: React Hooks + 간단한 Context API
+
+
 
 
 ### 검증 시나리오 (스크린샷 첨부)
