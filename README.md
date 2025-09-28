@@ -31,20 +31,5 @@ DELETE /api/v1/users/revoke → 멤버십 회수
 
 
 
-### 검증 시나리오 (스크린샷 첨부)
 
-만료 후 홈 → My Memberships 없음 + Can Chat=false
-
-<img src="screen_A_ping.png" width="500"/>  
-<img src="screen_B_expired_home.png" width="500"/>  
-<img src="screen_C_chat_block.png" width="500"/>  
-
-Grant 후 → Premium 활성 + Can Chat=true
-
-<img src="screen_D_grant_home.png" width="500"/>  
-<img src="screen_E_chat_welcome.png" width="500"/>  
-
-추가 기능: Notes CRUD 확인
-
-<img src="screen_F_notes.png" width="500"/>
 
