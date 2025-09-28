@@ -33,25 +33,26 @@ DELETE /api/v1/users/revoke → 멤버십 회수
 ### 검증 시나리오 (스크린샷 첨부)
 
 ## 1. Ping 확인
-<img src="./ping.png" width="500"/>
+<img src="./ringle-frontend/ping.png" width="500"/>
 
 ## 2. Backend 실행
-<img src="./backend.png" width="500"/>
+<img src="./ringle-frontend/backend.png" width="500"/>
 
 ## 3. 멤버십 조회 & 구매/지급/회수
-<img src="./memberships.png" width="500"/>
+<img src="./ringle-frontend/memberships.png" width="500"/>
 
 ## 4. Notes 생성/조회
-<img src="./chat note.png" width="500"/>
+<img src="./ringle-frontend/chat_note.png" width="500"/>
 
 ## 5. AI 대화
-<img src="./ai_chat.png" width="500"/>
+<img src="./ringle-frontend/ai_chat.png" width="500"/>
 
 ## 6. 권한 오류 (만료 후 차단)
-<img src="./chat_block.png" width="500"/>
+<img src="./ringle-frontend/chat_block.png" width="500"/>
 
 ## 7. Frontend 실행
-<img src="./frontend.png" width="500"/>
+<img src="./ringle-frontend/frontend.png" width="500"/>
+
 
 
 
